@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Zeron Mail Viewer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Special+Elite&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  --bg-1: #f6f1fb;
+  --bg-2: #fdf2f6;
+  --paper: #fffcf9;
+  --paper-shadow: #ece2f4;
+  --ink: #322b52;
+  --ink-soft: #6a6288;
+  --ink-faint: #a89dc7;
+  --line: #e6dbf3;
+  --violet: #8a76c9;
+  --violet-deep: #5f4baa;
+  --pink: #f0a8c9;
+  --gold: #eeb949;
+  --sage: #9cb68f;
+  --sky: #8db3ea;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-type: 'Special Elite', 'Courier New', monospace;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-display);
+  background: radial-gradient(120% 90% at 50% -10%, var(--bg-2) 0%, var(--bg-1) 55%, var(--bg-1) 100%);
+  color: var(--ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px 60px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* scattered twinkle sparkles */
+.sparkle-field { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.spark {
+  position: absolute;
+  width: 9px; height: 9px;
+  opacity: 0.55;
+  animation: twinkle 3.6s ease-in-out infinite;
+}
+.spark svg { width: 100%; height: 100%; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.7) rotate(0deg); }
+  50% { opacity: 0.75; transform: scale(1) rotate(8deg); }
+}
+
+#app { max-width: 540px; width: 100%; position: relative; z-index: 1; }
+
+/* ── Masthead ── */
+.masthead { text-align: center; margin-bottom: 22px; }
+.masthead .eyebrow-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.masthead .eyebrow {
+  font-family: var(--font-type);
+  font-size: 10.5px;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: var(--violet-deep);
+  opacity: 0.85;
+}
+.masthead .eyebrow-row svg { width: 11px; height: 11px; opacity: 0.7; }
+
+.masthead h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-optical-sizing: auto;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.masthead h1 .accent { color: var(--violet-deep); font-style: italic; font-weight: 500; }
+
+.masthead .hero-sub {
+  font-family: var(--font-type);
+  font-size: 11.5px;
+  letter-spacing: 1px;
+  color: var(--ink-faint);
+  margin-top: 6px;
+}
+
+.dot-trio { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+.dot-trio span {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--violet);
+  opacity: 0.55;
+}
+.dot-trio span:nth-child(2) { background: var(--pink); opacity: 0.7; }
+.dot-trio span:nth-child(3) { background: var(--gold); opacity: 0.65; }
+
+/* ── Loading ── */
+.loading { padding: 66px 20px; text-align: center; }
+.loading .spark-loader {
+  width: 30px; height: 30px;
+  margin: 0 auto 16px;
+  animation: spinSlow 2.4s linear infinite;
+  color: var(--violet);
+  opacity: 0.85;
+}
+@keyframes spinSlow { to { transform: rotate(360deg); } }
+.loading .typewriter-line {
+  display: inline-block;
+  font-family: var(--font-type);
+  font-size: 12.5px;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+  border-right: 2px solid var(--violet);
+  white-space: nowrap;
+  overflow: hidden;
+  animation: caret 0.8s step-end infinite;
+}
+@keyframes caret { 50% { border-color: transparent; } }
+
+/* ── Letter card ── */
+.letter-wrap { position: relative; }
+
+.tear-edge {
+  height: 12px; width: 100%;
+  background: var(--bg-1);
+  clip-path: polygon(0% 100%,3% 20%,7% 90%,11% 15%,15% 95%,19% 25%,23% 100%,27% 10%,31% 85%,35% 20%,39% 100%,43% 15%,47% 90%,51% 25%,55% 100%,59% 10%,63% 90%,67% 20%,71% 100%,75% 15%,79% 95%,83% 20%,87% 100%,91% 10%,95% 90%,100% 100%,100% 100%,0% 100%);
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 2;
+}
+
+.letter-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 6px 8px 0 var(--paper-shadow), 6px 8px 0 1px rgba(95,75,170,0.06);
+  position: relative;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: settleIn 0.7s cubic-bezier(0.2,0,0,1) 0.15s forwards;
+}
+@keyframes settleIn { to { opacity: 1; transform: translateY(0); } }
+
+/* small corner sprig — quiet fill for the space beside the postmark */
+.corner-sprig {
+  position: absolute;
+  top: -8px;
+  right: 78px;
+  width: 34px;
+  height: 34px;
+  z-index: 3;
+  opacity: 0;
+  animation: sprigIn 0.5s ease 0.55s forwards;
+}
+@keyframes sprigIn { to { opacity: 0.85; } }
+
+/* postmark — the single corner mark, kept clean and unobstructed */
+.postmark {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 64px;
+  height: 64px;
+  color: var(--violet-deep);
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transform: rotate(-9deg) scale(1.2);
+  animation: stampDown 0.4s cubic-bezier(0.3,0,0.2,1) 0.75s forwards;
+  z-index: 4;
+  pointer-events: none;
+}
+@keyframes stampDown { to { opacity: 0.75; transform: rotate(-9deg) scale(1); } }
+.postmark svg { width: 100%; height: 100%; }
+.postmark text { font-family: var(--font-mono); fill: currentColor; }
+
+/* letterhead */
+.letterhead { padding: 30px 24px 18px; }
+.letterhead .from-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 18px;
+}
+.seal-avatar {
+  position: relative;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 32% 26%, #fdeef6 0%, #d9c3ee 32%, #9a80cf 68%, #6a56b0 100%);
+  box-shadow:
+    inset 0 -3px 5px rgba(95,75,170,0.4),
+    inset 0 2px 3px rgba(255,255,255,0.65),
+    0 3px 7px rgba(95,75,170,0.28);
+  display: flex; align-items: center; justify-content: center;
+}
+.seal-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid rgba(138,118,201,0.4);
+}
+.seal-avatar .seal-spark {
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 11px; height: 11px;
+}
+.seal-avatar span {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(90,70,160,0.5);
+  letter-spacing: 0.2px;
+}
+.letterhead .from-text { min-width: 0; }
+.letterhead .from-text .k {
+  font-family: var(--font-type);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+  margin-bottom: 2px;
+}
+.letterhead .from-text .v {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.field-line {
+  display: flex; gap: 14px; padding: 8px 0;
+  border-bottom: 1px dotted var(--line);
+  font-size: 13.5px;
+}
+.field-line:last-child { border-bottom: none; }
+.field-line .k {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  width: 62px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.field-line .v { color: var(--ink-soft); word-break: break-word; flex: 1; }
+#msg-subject.v { color: var(--ink); font-weight: 600; }
+#msg-uid.v { font-family: var(--font-mono); font-size: 12px; }
+
+/* perforation */
+.perforation { position: relative; height: 0; border-top: 1.5px dashed var(--line); margin: 4px 22px 0; }
+.perforation::before, .perforation::after {
+  content: ''; position: absolute; top: -8px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--bg-1);
+}
+.perforation::before { left: -30px; }
+.perforation::after { right: -30px; }
+
+/* body */
+.letter-body-wrap { padding: 22px 24px 28px; }
+.letter-body-wrap .body-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+.body-content {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 70px;
+}
+.body-content.typing { border-right: 2px solid var(--violet); }
+.body-content.empty { font-style: italic; color: var(--ink-faint); opacity: 0.85; }
+
+/* footer */
+.footer { text-align: center; padding: 20px 0 0; }
+.footer-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-type);
+  font-size: 10.5px; letter-spacing: 0.6px;
+  color: var(--ink-soft);
+}
+.footer-chip svg { width: 13px; height: 13px; opacity: 0.8; }
+
+/* error */
+.error { text-align: center; padding: 58px 24px; }
+.error .rts-stamp {
+  display: inline-block;
+  font-family: var(--font-type);
+  font-size: 14px; letter-spacing: 2px;
+  color: var(--violet-deep);
+  border: 3px double var(--violet-deep);
+  padding: 10px 18px;
+  transform: rotate(-5deg);
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+  margin-bottom: 20px;
+}
+.error .error-desc {
+  font-family: var(--font-display);
+  font-size: 14px; color: var(--ink-soft);
+  max-width: 280px; margin: 0 auto; line-height: 1.6;
+}
+
+.hidden { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body { padding: 28px 10px 48px; }
+  .masthead h1 { font-size: 26px; }
+  .letterhead { padding: 26px 18px 14px; }
+  .letter-body-wrap { padding: 18px 18px 22px; }
+  .postmark { width: 54px; height: 54px; right: 12px; top: 14px; }
+  .corner-sprig { right: 60px; top: -6px; width: 28px; height: 28px; }
+  .perforation { margin: 4px 16px 0; }
+  .field-line .k { width: 54px; }
+}
+
+/* scroll works, scrollbar hidden */
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+body::-webkit-scrollbar,
+html::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* no long-press callout, no selection highlight, no copy menu */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+::selection {
+  background: transparent;
+  color: inherit;
+}
+::-moz-selection {
+  background: transparent;
+  color: inherit;
+}
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="wingGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#8a76c9"/>
+        <stop offset="55%" stop-color="#f0a8c9"/>
+        <stop offset="100%" stop-color="#eeb949"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="sparkle-field" id="sparkle-field"></div>
+
+  <div id="app">
+    <div class="masthead">
+      <div class="eyebrow-row">
+        <svg viewBox="0 0 20 20" fill="#eeb949"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
+        <span class="eyebrow">Delivered with care</span>
+        <svg viewBox="0 0 20 20" fill="#eeb949"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
+      </div>
+      <h1>Zeron <span class="accent">Mail</span></h1>
+      <div class="hero-sub">TEMP GMAIL &middot; MESSAGE VIEWER</div>
+      <div class="dot-trio"><span></span><span></span><span></span></div>
+    </div>
+
+    <div id="loading" class="loading">
+      <svg class="spark-loader" viewBox="0 0 20 20" fill="currentColor"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
+      <span class="typewriter-line" id="loading-text"></span>
+    </div>
+
+    <div id="content" class="hidden">
+      <div class="letter-wrap">
+        <div class="tear-edge"></div>
+        <div class="letter-card">
+          <div class="corner-sprig">
+            <svg viewBox="0 0 40 40">
+              <path d="M20,36 C19,26 17,20 8,12" fill="none" stroke="#8a76c9" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+              <ellipse cx="12" cy="17" rx="4" ry="1.8" fill="#9cb68f" opacity="0.75" transform="rotate(-35 12 17)"/>
+              <g transform="translate(7,9)">
+                <circle cx="-3.2" cy="0" r="2.8" fill="#f0a8c9"/>
+                <circle cx="3.2" cy="0" r="2.8" fill="#f0a8c9"/>
+                <circle cx="0" cy="-3.2" r="2.8" fill="#f0a8c9"/>
+                <circle cx="0" cy="3.2" r="2.8" fill="#f0a8c9"/>
+                <circle cx="0" cy="0" r="1.3" fill="#eeb949"/>
+              </g>
+            </svg>
+          </div>
+
+          <div class="postmark" id="postmark">
+            <svg viewBox="0 0 120 120">
+              <defs>
+                <path id="circlePath" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/>
+              </defs>
+              <circle cx="60" cy="60" r="44" fill="none" stroke="currentColor" stroke-width="1.4"/>
+              <circle cx="60" cy="60" r="35" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="1.5 3"/>
+              <text font-size="8" letter-spacing="2">
+                <textPath href="#circlePath" startOffset="2%">ZERON TEMP MAIL &#8226; VERIFIED &#8226;</textPath>
+              </text>
+              <text x="60" y="57" text-anchor="middle" font-size="12.5" font-weight="600" id="postmark-date">MAIL</text>
+              <text x="60" y="71" text-anchor="middle" font-size="6" letter-spacing="1" id="postmark-sub">RECEIVED</text>
+            </svg>
+          </div>
+
+          <div class="letterhead">
+            <div class="from-row">
+              <div class="seal-avatar">
+                <span id="sender-avatar">?</span>
+                <svg class="seal-spark" viewBox="0 0 20 20" fill="#eeb949"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
+              </div>
+              <div class="from-text">
+                <span class="k">From</span>
+                <span class="v" id="msg-from">&mdash;</span>
+              </div>
+            </div>
+            <div class="field-line"><span class="k">To</span><span class="v" id="msg-to">&mdash;</span></div>
+            <div class="field-line"><span class="k">Date</span><span class="v" id="msg-date">&mdash;</span></div>
+            <div class="field-line"><span class="k">Subject</span><span class="v" id="msg-subject">&mdash;</span></div>
+            <div class="field-line"><span class="k">UID</span><span class="v" id="msg-uid">&mdash;</span></div>
+          </div>
+
+          <div class="perforation"></div>
+
+          <div class="letter-body-wrap">
+            <div class="body-label">Message</div>
+            <div class="body-content" id="msg-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="footer-chip">
+          <svg viewBox="0 0 34 28"><line x1="17" y1="4" x2="17" y2="24" stroke="#6a6288" stroke-width="1.1"/><ellipse cx="9" cy="11" rx="8.5" ry="6.5" fill="url(#wingGrad)" opacity="0.7"/><ellipse cx="25" cy="11" rx="8.5" ry="6.5" fill="url(#wingGrad)" opacity="0.7"/></svg>
+          Zeron Temp Mail &mdash; crafted with care
+        </div>
+      </div>
+    </div>
+
+    <div id="error" class="error hidden">
+      <div class="rts-stamp">Return to Sender</div>
+      <div class="error-desc">The link may be invalid or expired. Please check the URL and try again.</div>
+    </div>
+  </div>
+
+  <script>
+(function() {
+  function getParam(name) {
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name) || '';
+  }
+  function decodeSafe(str) {
+    try { return decodeURIComponent(str.replace(/\+/g, ' ')); } catch { return str; }
+  }
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function seedSparkles() {
+    const field = document.getElementById('sparkle-field');
+    const positions = [
+      [4,10],[92,8],[8,32],[95,28],[3,58],[90,64],[12,86],[88,90],[50,4],[48,95],[22,48],[76,44]
+    ];
+    const colors = ['#8a76c9', '#f0a8c9', '#eeb949'];
+    positions.forEach(function (pos, i) {
+      const el = document.createElement('div');
+      el.className = 'spark';
+      el.style.left = pos[0] + '%';
+      el.style.top = pos[1] + '%';
+      el.style.animationDelay = (i * 0.35) + 's';
+      const color = colors[i % colors.length];
+      el.innerHTML = '<svg viewBox="0 0 20 20" fill="' + color + '"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>';
+      field.appendChild(el);
+    });
+  }
+
+  function typeBody(element, text, speed) {
+    if (prefersReducedMotion) { element.textContent = text; return; }
+    speed = speed || 10;
+    let i = 0;
+    element.textContent = '';
+    element.classList.add('typing');
+    function tick() {
+      if (i < text.length) {
+        element.textContent += text.slice(i, i + 2);
+        i += 2;
+        setTimeout(() => requestAnimationFrame(tick), speed);
+      } else {
+        element.classList.remove('typing');
+      }
+    }
+    tick();
+  }
+
+  function typeLoadingLine(el, text, speed) {
+    if (prefersReducedMotion) { el.textContent = text; return; }
+    speed = speed || 32;
+    let i = 0;
+    el.textContent = '';
+    function tick() {
+      if (i < text.length) { el.textContent += text.charAt(i); i++; setTimeout(tick, speed); }
+    }
+    tick();
+  }
+
+  function getInitials(email) {
+    if (!email) return '?';
+    const name = email.split('@')[0];
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  function formatPostmarkDate(dateStr) {
+    if (!dateStr) return { top: 'MAIL', sub: 'RECEIVED' };
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return { top: 'MAIL', sub: 'RECEIVED' };
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    return { top: d.getDate() + ' ' + months[d.getMonth()], sub: d.getFullYear().toString() };
+  }
+
+  function initTelegramMiniApp() {
+    if (!(window.Telegram && window.Telegram.WebApp)) return;
+    const tg = window.Telegram.WebApp;
+    try {
+      tg.ready();
+      tg.expand();
+      if (typeof tg.requestFullscreen === 'function') {
+        tg.requestFullscreen();
+      }
+      if (typeof tg.onEvent === 'function') {
+        tg.onEvent('fullscreenFailed', function () {
+          // Fullscreen isn't supported on this client; expand() already covers it.
+        });
+      }
+      if (typeof tg.disableVerticalSwipes === 'function') {
+        tg.disableVerticalSwipes();
+      }
+    } catch (e) {
+      /* not running inside Telegram, ignore */
+    }
+  }
+
+  function init() {
+    initTelegramMiniApp();
+    seedSparkles();
+    typeLoadingLine(document.getElementById('loading-text'), 'retrieving message…');
+
+    const from = decodeSafe(getParam('from'));
+    const to = decodeSafe(getParam('to'));
+    const date = decodeSafe(getParam('date'));
+    const subject = decodeSafe(getParam('subject'));
+    const body = decodeSafe(getParam('body'));
+    const uid = decodeSafe(getParam('uid'));
+
+    if (!from && !subject && !body) {
+      setTimeout(function () {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+      }, 500);
+      return;
+    }
+
+    document.getElementById('msg-from').textContent = from || '—';
+    document.getElementById('msg-to').textContent = to || '—';
+    document.getElementById('msg-date').textContent = date || '—';
+    document.getElementById('msg-subject').textContent = subject || '(no subject)';
+    document.getElementById('msg-uid').textContent = uid || '—';
+    document.getElementById('sender-avatar').textContent = getInitials(from);
+
+    const pm = formatPostmarkDate(date);
+    document.getElementById('postmark-date').textContent = pm.top;
+    document.getElementById('postmark-sub').textContent = pm.sub;
+
+    const bodyEl = document.getElementById('msg-body');
+    if (body) { typeBody(bodyEl, body); }
+    else { bodyEl.textContent = '(empty)'; bodyEl.classList.add('empty'); }
+
+    const loadEl = document.getElementById('loading');
+    const contentEl = document.getElementById('content');
+    setTimeout(function () {
+      loadEl.classList.add('hidden');
+      contentEl.classList.remove('hidden');
+    }, 850);
+
+    const subj = subject || 'Message';
+    document.title = subj.length > 40 ? subj.slice(0, 40) + '...' : subj;
+  }
+
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  document.addEventListener('copy', function (e) { e.preventDefault(); });
+  document.addEventListener('selectstart', function (e) { e.preventDefault(); });
+  document.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+  </script>
+</body>
+</html>
