@@ -20,6 +20,7 @@
   --accent-2: #F2C200;   /* yellow */
   --accent-3: #1B4DFF;   /* blue */
   --accent-4: #1B8A3B;   /* green */
+  --grid-line: rgba(10,10,10,0.07);
   --border-width: 3px;
   --shadow-offset: 6px;
   --shadow: var(--shadow-offset) var(--shadow-offset) 0 0 var(--ink);
@@ -29,38 +30,81 @@
   --radius: 0px;
 }
 
+body.dark-mode {
+  --bg: #0D0D0D;
+  --ink: #F2F2F0;
+  --surface: #171717;
+  --ink-soft: #C9C9C4;
+  --ink-faint: #7A7A75;
+  --line: #F2F2F0;
+  --accent: #FF4433;
+  --accent-2: #39FF14;
+  --accent-3: #4DA3FF;
+  --accent-4: #39FF14;
+  --grid-line: rgba(255,255,255,0.06);
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { background: var(--bg); }
 
 body {
   font-family: var(--font-body);
   background: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
   color: var(--ink);
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   justify-content: center;
-  padding: 40px 16px 60px;
+  padding: calc(64px + env(safe-area-inset-top, 0px)) 16px 60px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   position: relative;
   overflow-x: hidden;
+  transition: background-color 150ms linear, color 150ms linear;
 }
 
-/* scattered brutalist marks (kept functionally identical to original sparkle field) */
+/* scattered brutalist marks */
 .sparkle-field { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 .spark {
   position: absolute;
   width: 12px; height: 12px;
-  opacity: 0.6;
+  opacity: 0.55;
   animation: twinkle 3.6s ease-in-out infinite;
 }
 .spark svg { width: 100%; height: 100%; }
 @keyframes twinkle {
-  0%, 100% { opacity: 0.15; transform: scale(0.7) rotate(0deg); }
-  50% { opacity: 0.9; transform: scale(1) rotate(8deg); }
+  0%, 100% { opacity: 0.12; transform: scale(0.7) rotate(0deg); }
+  50% { opacity: 0.8; transform: scale(1) rotate(8deg); }
 }
 
 #app { max-width: 540px; width: 100%; position: relative; z-index: 1; }
+
+/* ── Theme toggle ── */
+.theme-toggle {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  z-index: 30;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  padding: 0.5em 0.8em;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 0 var(--ink);
+  transition: transform 100ms linear, box-shadow 100ms linear;
+}
+.theme-toggle:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 0 var(--ink); }
+.theme-toggle:active { transform: translate(3px,3px); box-shadow: 0 0 0 0 var(--ink); }
 
 /* ── Masthead ── */
 .masthead { text-align: center; margin-bottom: 26px; }
@@ -167,7 +211,7 @@ body {
 }
 @keyframes settleIn { to { opacity: 1; transform: translateY(0); } }
 
-/* postmark — brutalist stamp, top-right corner */
+/* postmark */
 .postmark {
   position: absolute;
   top: 20px;
@@ -230,7 +274,8 @@ body {
   color: var(--surface);
   letter-spacing: 0.2px;
 }
-.letterhead .from-text { min-width: 0; }
+.letterhead .from-text { min-width: 0; flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.letterhead .from-text .from-meta { min-width: 0; }
 .letterhead .from-text .k {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -253,6 +298,7 @@ body {
   display: flex; gap: 14px; padding: 10px 0;
   border-bottom: 2px solid var(--line);
   font-size: 13.5px;
+  align-items: flex-start;
 }
 .field-line:last-child { border-bottom: none; }
 .field-line .k {
@@ -267,15 +313,42 @@ body {
   font-weight: 700;
 }
 .field-line .v { color: var(--ink-soft); word-break: break-word; flex: 1; font-weight: 500; }
+.field-line .field-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: 1; min-width: 0; }
+.field-line .rel-badge {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.6px;
+  text-transform: uppercase; color: var(--ink); background: var(--accent-2);
+  border: 1.5px solid var(--ink); padding: 0.15em 0.45em; flex-shrink: 0;
+}
 #msg-subject.v { color: var(--ink); font-weight: 700; }
 #msg-uid.v { font-family: var(--font-mono); font-size: 12px; }
 
-/* perforation — solid brutalist divider */
+/* ── copy button (icon) ── */
+.copy-btn {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0;
+  transition: background 100ms linear, color 100ms linear, transform 100ms linear;
+}
+.copy-btn svg { width: 12px; height: 12px; }
+.copy-btn:hover { background: var(--ink); color: var(--surface); }
+.copy-btn:active { transform: scale(0.9); }
+.copy-btn.copied { background: var(--accent-4); border-color: var(--ink); color: #fff; }
+
+/* perforation */
 .perforation { height: 0; border-top: var(--border-width) solid var(--ink); margin: 4px 0 0; }
 
-/* body */
-.letter-body-wrap { padding: 22px 24px 28px; }
-.letter-body-wrap .body-label {
+/* ── Message section (redesigned) ── */
+.letter-body-wrap { padding: 22px 24px 26px; }
+.body-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.body-label {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 1.5px;
@@ -283,22 +356,109 @@ body {
   color: var(--ink);
   background: var(--accent-2);
   display: inline-block;
-  padding: 0.25em 0.6em;
+  padding: 0.3em 0.65em;
   border: 2px solid var(--ink);
-  margin-bottom: 14px;
   font-weight: 700;
+}
+.body-actions { display: flex; gap: 8px; }
+.body-actions .copy-btn { width: 28px; height: 28px; }
+
+.body-frame {
+  border: 2px solid var(--ink);
+  background: var(--bg);
+  padding: 16px;
 }
 .body-content {
   font-family: var(--font-body);
-  font-size: 15.5px;
+  font-size: 15px;
   line-height: 1.85;
   color: var(--ink-soft);
   white-space: pre-wrap;
   word-break: break-word;
-  min-height: 70px;
+  min-height: 60px;
 }
 .body-content.typing { border-right: 3px solid var(--accent); }
 .body-content.empty { font-style: italic; color: var(--ink-faint); opacity: 0.85; }
+.body-content a.body-link {
+  color: var(--accent-3);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+body.dark-mode .body-content a.body-link { color: var(--accent-3); }
+
+/* ── URL quick-open chip (appears under body if a link is detected) ── */
+.link-chip-row { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.link-chip {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  border: 2px solid var(--ink);
+  background: var(--accent-3);
+  color: #fff;
+  padding: 0.7em 0.9em;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 3px 3px 0 0 var(--ink);
+  transition: transform 100ms linear, box-shadow 100ms linear;
+}
+.link-chip:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 0 var(--ink); }
+.link-chip:active { transform: translate(3px,3px); box-shadow: 0 0 0 0 var(--ink); }
+.link-chip span.url-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-chip .arrow { flex-shrink: 0; }
+
+/* ── OTP / verification code callout ── */
+.code-callout {
+  margin-top: 16px;
+  border: var(--border-width) solid var(--ink);
+  background: var(--accent-2);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  flex-wrap: wrap;
+}
+.code-callout .code-info { min-width: 0; }
+.code-callout .code-label {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--ink); font-weight: 700; display: block; margin-bottom: 4px;
+}
+.code-callout .code-value {
+  font-family: var(--font-display);
+  font-size: 26px; letter-spacing: 4px; color: var(--ink);
+  word-break: break-all;
+}
+.code-callout .copy-btn {
+  width: 40px; height: 40px;
+  background: var(--ink); color: var(--bg); border-color: var(--ink);
+  flex-shrink: 0;
+}
+.code-callout .copy-btn svg { width: 16px; height: 16px; }
+.code-callout .copy-btn:hover { background: var(--surface); color: var(--ink); }
+
+/* ── toast ── */
+.toast {
+  position: fixed;
+  left: 50%; bottom: 26px;
+  transform: translate(-50%, 20px);
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 2px solid var(--ink);
+  padding: 0.7em 1.2em;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 160ms cubic-bezier(0.2,0,0,1), opacity 160ms linear;
+  z-index: 200;
+  box-shadow: 4px 4px 0 0 var(--accent-2);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 /* footer */
 .footer { text-align: center; padding: 24px 0 0; }
@@ -346,28 +506,20 @@ body {
 }
 
 @media (max-width: 480px) {
-  body { padding: 28px 10px 48px; }
+  body { padding: calc(58px + env(safe-area-inset-top, 0px)) 10px 48px; }
   .masthead h1 { font-size: 32px; }
   .letterhead { padding: 26px 18px 14px; }
   .letter-body-wrap { padding: 18px 18px 22px; }
   .postmark { width: 62px; right: 14px; top: 16px; padding: 8px 4px; }
   .postmark .postmark__date { font-size: 12px; }
   .field-line .k { width: 56px; }
+  .code-callout .code-value { font-size: 21px; letter-spacing: 2px; }
+  .theme-toggle { top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; }
 }
 
-/* scroll works, scrollbar hidden */
-html, body {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-body::-webkit-scrollbar,
-html::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+body::-webkit-scrollbar, html::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
-/* no long-press callout, no selection highlight, no copy menu */
 * {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -375,17 +527,12 @@ html::-webkit-scrollbar {
   -ms-user-select: none;
   user-select: none;
 }
-::selection {
-  background: transparent;
-  color: inherit;
-}
-::-moz-selection {
-  background: transparent;
-  color: inherit;
-}
+::selection { background: transparent; color: inherit; }
+::-moz-selection { background: transparent; color: inherit; }
 </style>
 </head>
 <body>
+  <button class="theme-toggle" id="theme-toggle" type="button">DARK</button>
   <div class="sparkle-field" id="sparkle-field"></div>
 
   <div id="app">
@@ -419,21 +566,59 @@ html::-webkit-scrollbar {
                 <span id="sender-avatar">?</span>
               </div>
               <div class="from-text">
-                <span class="k">From</span>
-                <span class="v" id="msg-from">&mdash;</span>
+                <div class="from-meta">
+                  <span class="k">From</span>
+                  <span class="v" id="msg-from">&mdash;</span>
+                </div>
+                <button class="copy-btn" id="copy-from-btn" type="button" aria-label="Copy sender email">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="8" y="8" width="13" height="13"/><path d="M3 16V3h13"/></svg>
+                </button>
               </div>
             </div>
             <div class="field-line"><span class="k">To</span><span class="v" id="msg-to">&mdash;</span></div>
-            <div class="field-line"><span class="k">Date</span><span class="v" id="msg-date">&mdash;</span></div>
+            <div class="field-line">
+              <span class="k">Date</span>
+              <div class="field-row">
+                <span class="v" id="msg-date">&mdash;</span>
+                <span class="rel-badge" id="msg-relative"></span>
+              </div>
+            </div>
             <div class="field-line"><span class="k">Subject</span><span class="v" id="msg-subject">&mdash;</span></div>
-            <div class="field-line"><span class="k">UID</span><span class="v" id="msg-uid">&mdash;</span></div>
+            <div class="field-line">
+              <span class="k">UID</span>
+              <div class="field-row">
+                <span class="v" id="msg-uid">&mdash;</span>
+                <button class="copy-btn" id="copy-uid-btn" type="button" aria-label="Copy UID">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="8" y="8" width="13" height="13"/><path d="M3 16V3h13"/></svg>
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="perforation"></div>
 
           <div class="letter-body-wrap">
-            <div class="body-label">Message</div>
-            <div class="body-content" id="msg-body"></div>
+            <div class="body-header">
+              <span class="body-label">Message</span>
+              <div class="body-actions">
+                <button class="copy-btn" id="copy-message-btn" type="button" aria-label="Copy message">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="8" y="8" width="13" height="13"/><path d="M3 16V3h13"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="body-frame">
+              <div class="body-content" id="msg-body"></div>
+              <div class="link-chip-row hidden" id="link-chip-row"></div>
+            </div>
+            <div class="code-callout hidden" id="code-callout">
+              <div class="code-info">
+                <span class="code-label">Verification Code</span>
+                <span class="code-value" id="code-value">000000</span>
+              </div>
+              <button class="copy-btn" id="copy-code-btn" type="button" aria-label="Copy code">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="8" y="8" width="13" height="13"/><path d="M3 16V3h13"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -449,6 +634,8 @@ html::-webkit-scrollbar {
     </div>
   </div>
 
+  <div class="toast" id="toast">Copied</div>
+
   <script>
 (function() {
   function getParam(name) {
@@ -460,6 +647,54 @@ html::-webkit-scrollbar {
   }
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ---------- theme toggle ---------- */
+  function initTheme() {
+    const btn = document.getElementById('theme-toggle');
+    btn.addEventListener('click', function () {
+      const isDark = document.body.classList.toggle('dark-mode');
+      btn.textContent = isDark ? 'LIGHT' : 'DARK';
+    });
+  }
+
+  /* ---------- toast ---------- */
+  let toastTimer = null;
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1500);
+  }
+
+  /* ---------- clipboard ---------- */
+  function copyText(text, btnEl) {
+    if (!text) return;
+    function done() {
+      if (btnEl) {
+        btnEl.classList.add('copied');
+        setTimeout(function () { btnEl.classList.remove('copied'); }, 900);
+      }
+      showToast('Copied');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text);
+      done();
+    }
+  }
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- sparkles ---------- */
   function seedSparkles() {
     const field = document.getElementById('sparkle-field');
     const positions = [
@@ -478,8 +713,65 @@ html::-webkit-scrollbar {
     });
   }
 
-  function typeBody(element, text, speed) {
-    if (prefersReducedMotion) { element.textContent = text; return; }
+  /* ---------- text helpers ---------- */
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  const URL_RE = /(https?:\/\/[^\s<]+[^\s<.,:;"')\]])/gi;
+
+  function linkifyHtml(rawText) {
+    const escaped = escapeHtml(rawText);
+    return escaped.replace(URL_RE, function (m) {
+      return '<a class="body-link" href="' + m + '" target="_blank" rel="noopener noreferrer">' + m + '</a>';
+    });
+  }
+
+  function findUrls(rawText) {
+    const matches = rawText.match(URL_RE);
+    return matches ? Array.from(new Set(matches)) : [];
+  }
+
+  function extractCode(rawText) {
+    if (!rawText) return null;
+    const labeled = rawText.match(/(?:code|otp|pin|passcode)[^0-9]{0,12}(\d{4,8})/i);
+    if (labeled) return labeled[1];
+    const plain = rawText.match(/\b\d{4,8}\b/);
+    return plain ? plain[0] : null;
+  }
+
+  function renderLinkChips(rawText) {
+    const row = document.getElementById('link-chip-row');
+    const urls = findUrls(rawText);
+    row.innerHTML = '';
+    if (!urls.length) { row.classList.add('hidden'); return; }
+    urls.slice(0, 3).forEach(function (u) {
+      const a = document.createElement('a');
+      a.className = 'link-chip';
+      a.href = u;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.innerHTML = '<span class="url-text">' + escapeHtml(u) + '</span><span class="arrow">&#8594;</span>';
+      row.appendChild(a);
+    });
+    row.classList.remove('hidden');
+  }
+
+  function renderCodeCallout(rawText) {
+    const callout = document.getElementById('code-callout');
+    const code = extractCode(rawText);
+    if (!code) { callout.classList.add('hidden'); return; }
+    document.getElementById('code-value').textContent = code;
+    callout.classList.remove('hidden');
+    document.getElementById('copy-code-btn').onclick = function () { copyText(code, this); };
+  }
+
+  /* ---------- typing effect ---------- */
+  function typeBody(element, text, speed, onDone) {
+    if (prefersReducedMotion) {
+      element.innerHTML = linkifyHtml(text);
+      if (onDone) onDone();
+      return;
+    }
     speed = speed || 10;
     let i = 0;
     element.textContent = '';
@@ -491,6 +783,8 @@ html::-webkit-scrollbar {
         setTimeout(() => requestAnimationFrame(tick), speed);
       } else {
         element.classList.remove('typing');
+        element.innerHTML = linkifyHtml(text);
+        if (onDone) onDone();
       }
     }
     tick();
@@ -521,6 +815,21 @@ html::-webkit-scrollbar {
     return { top: d.getDate() + ' ' + months[d.getMonth()], sub: d.getFullYear().toString() };
   }
 
+  function timeAgo(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const diffSec = Math.round((Date.now() - d.getTime()) / 1000);
+    if (diffSec < 5) return 'JUST NOW';
+    if (diffSec < 60) return diffSec + 'S AGO';
+    const m = Math.round(diffSec / 60);
+    if (m < 60) return m + 'M AGO';
+    const h = Math.round(m / 60);
+    if (h < 24) return h + 'H AGO';
+    const dd = Math.round(h / 24);
+    return dd + 'D AGO';
+  }
+
   function initTelegramMiniApp() {
     if (!(window.Telegram && window.Telegram.WebApp)) return;
     const tg = window.Telegram.WebApp;
@@ -544,6 +853,7 @@ html::-webkit-scrollbar {
   }
 
   function init() {
+    initTheme();
     initTelegramMiniApp();
     seedSparkles();
     typeLoadingLine(document.getElementById('loading-text'), 'RETRIEVING MESSAGE...');
@@ -569,14 +879,27 @@ html::-webkit-scrollbar {
     document.getElementById('msg-subject').textContent = subject || '(no subject)';
     document.getElementById('msg-uid').textContent = uid || '—';
     document.getElementById('sender-avatar').textContent = getInitials(from);
+    document.getElementById('msg-relative').textContent = timeAgo(date);
 
     const pm = formatPostmarkDate(date);
     document.getElementById('postmark-date').textContent = pm.top;
     document.getElementById('postmark-sub').textContent = pm.sub;
 
     const bodyEl = document.getElementById('msg-body');
-    if (body) { typeBody(bodyEl, body); }
-    else { bodyEl.textContent = '(empty)'; bodyEl.classList.add('empty'); }
+    if (body) {
+      typeBody(bodyEl, body, 10, function () {
+        renderLinkChips(body);
+        renderCodeCallout(body);
+      });
+    } else {
+      bodyEl.textContent = '(empty)';
+      bodyEl.classList.add('empty');
+    }
+
+    /* copy buttons */
+    document.getElementById('copy-message-btn').addEventListener('click', function () { copyText(body, this); });
+    document.getElementById('copy-from-btn').addEventListener('click', function () { copyText(from, this); });
+    document.getElementById('copy-uid-btn').addEventListener('click', function () { copyText(uid, this); });
 
     const loadEl = document.getElementById('loading');
     const contentEl = document.getElementById('content');
