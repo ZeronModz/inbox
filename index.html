@@ -6,34 +6,34 @@
 <title>Zeron Mail Viewer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Special+Elite&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root {
-  --bg-1: #f6f1fb;
-  --bg-2: #fdf2f6;
-  --paper: #fffcf9;
-  --paper-shadow: #ece2f4;
-  --ink: #322b52;
-  --ink-soft: #6a6288;
-  --ink-faint: #a89dc7;
-  --line: #e6dbf3;
-  --violet: #8a76c9;
-  --violet-deep: #5f4baa;
-  --pink: #f0a8c9;
-  --gold: #eeb949;
-  --sage: #9cb68f;
-  --sky: #8db3ea;
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-type: 'Special Elite', 'Courier New', monospace;
+  --bg: #F4F1E9;
+  --ink: #0A0A0A;
+  --surface: #FFFFFF;
+  --ink-soft: #4A4A46;
+  --ink-faint: #8A8A82;
+  --line: #0A0A0A;
+  --accent: #E8342A;     /* red */
+  --accent-2: #F2C200;   /* yellow */
+  --accent-3: #1B4DFF;   /* blue */
+  --accent-4: #1B8A3B;   /* green */
+  --border-width: 3px;
+  --shadow-offset: 6px;
+  --shadow: var(--shadow-offset) var(--shadow-offset) 0 0 var(--ink);
+  --font-display: 'Archivo Black', 'Arial Black', sans-serif;
+  --font-body: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --radius: 0px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: var(--font-display);
-  background: radial-gradient(120% 90% at 50% -10%, var(--bg-2) 0%, var(--bg-1) 55%, var(--bg-1) 100%);
+  font-family: var(--font-body);
+  background: var(--bg);
   color: var(--ink);
   min-height: 100vh;
   min-height: 100dvh;
@@ -46,85 +46,98 @@ body {
   overflow-x: hidden;
 }
 
-/* scattered twinkle sparkles */
+/* scattered brutalist marks (kept functionally identical to original sparkle field) */
 .sparkle-field { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 .spark {
   position: absolute;
-  width: 9px; height: 9px;
-  opacity: 0.55;
+  width: 12px; height: 12px;
+  opacity: 0.6;
   animation: twinkle 3.6s ease-in-out infinite;
 }
 .spark svg { width: 100%; height: 100%; }
 @keyframes twinkle {
   0%, 100% { opacity: 0.15; transform: scale(0.7) rotate(0deg); }
-  50% { opacity: 0.75; transform: scale(1) rotate(8deg); }
+  50% { opacity: 0.9; transform: scale(1) rotate(8deg); }
 }
 
 #app { max-width: 540px; width: 100%; position: relative; z-index: 1; }
 
 /* ── Masthead ── */
-.masthead { text-align: center; margin-bottom: 22px; }
+.masthead { text-align: center; margin-bottom: 26px; }
 .masthead .eyebrow-row {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .masthead .eyebrow {
-  font-family: var(--font-type);
-  font-size: 10.5px;
-  letter-spacing: 2.6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--violet-deep);
-  opacity: 0.85;
+  color: var(--ink);
+  background: var(--accent-2);
+  border: 2px solid var(--ink);
+  padding: 0.3em 0.7em;
+  font-weight: 700;
 }
-.masthead .eyebrow-row svg { width: 11px; height: 11px; opacity: 0.7; }
 
 .masthead h1 {
   font-family: var(--font-display);
-  font-weight: 600;
-  font-optical-sizing: auto;
-  font-size: 32px;
+  font-size: 40px;
   letter-spacing: -0.01em;
+  line-height: 0.95;
   color: var(--ink);
+  text-transform: uppercase;
 }
-.masthead h1 .accent { color: var(--violet-deep); font-style: italic; font-weight: 500; }
+.masthead h1 .accent {
+  color: var(--surface);
+  background: var(--accent);
+  padding: 0 0.15em;
+  display: inline-block;
+  border: var(--border-width) solid var(--ink);
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transform: rotate(-2deg);
+}
 
 .masthead .hero-sub {
-  font-family: var(--font-type);
+  font-family: var(--font-mono);
   font-size: 11.5px;
-  letter-spacing: 1px;
-  color: var(--ink-faint);
-  margin-top: 6px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 10px;
 }
 
-.dot-trio { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+.dot-trio { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
 .dot-trio span {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--violet);
-  opacity: 0.55;
+  width: 10px; height: 10px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
 }
-.dot-trio span:nth-child(2) { background: var(--pink); opacity: 0.7; }
-.dot-trio span:nth-child(3) { background: var(--gold); opacity: 0.65; }
+.dot-trio span:nth-child(2) { background: var(--accent); }
+.dot-trio span:nth-child(3) { background: var(--accent-3); }
 
 /* ── Loading ── */
-.loading { padding: 66px 20px; text-align: center; }
+.loading { padding: 70px 20px; text-align: center; }
 .loading .spark-loader {
-  width: 30px; height: 30px;
-  margin: 0 auto 16px;
-  animation: spinSlow 2.4s linear infinite;
-  color: var(--violet);
-  opacity: 0.85;
+  width: 34px; height: 34px;
+  margin: 0 auto 18px;
+  border: 4px solid var(--ink);
+  border-top-color: var(--accent-2);
+  animation: spinSlow 800ms linear infinite;
 }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
 .loading .typewriter-line {
   display: inline-block;
-  font-family: var(--font-type);
+  font-family: var(--font-mono);
   font-size: 12.5px;
-  letter-spacing: 1px;
-  color: var(--ink-soft);
-  border-right: 2px solid var(--violet);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink);
+  border-right: 3px solid var(--accent);
   white-space: nowrap;
   overflow: hidden;
   animation: caret 0.8s step-end infinite;
+  font-weight: 600;
 }
 @keyframes caret { 50% { border-color: transparent; } }
 
@@ -132,118 +145,113 @@ body {
 .letter-wrap { position: relative; }
 
 .tear-edge {
-  height: 12px; width: 100%;
-  background: var(--bg-1);
-  clip-path: polygon(0% 100%,3% 20%,7% 90%,11% 15%,15% 95%,19% 25%,23% 100%,27% 10%,31% 85%,35% 20%,39% 100%,43% 15%,47% 90%,51% 25%,55% 100%,59% 10%,63% 90%,67% 20%,71% 100%,75% 15%,79% 95%,83% 20%,87% 100%,91% 10%,95% 90%,100% 100%,100% 100%,0% 100%);
-  margin-bottom: -1px;
+  height: 14px; width: 100%;
+  background: repeating-linear-gradient(
+    -45deg, var(--ink), var(--ink) 10px, var(--accent-2) 10px, var(--accent-2) 20px
+  );
+  border: var(--border-width) solid var(--ink);
+  border-bottom: none;
   position: relative;
   z-index: 2;
 }
 
 .letter-card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  box-shadow: 6px 8px 0 var(--paper-shadow), 6px 8px 0 1px rgba(95,75,170,0.06);
+  background: var(--surface);
+  border: var(--border-width) solid var(--ink);
+  border-top: none;
+  box-shadow: var(--shadow);
   position: relative;
   opacity: 0;
   transform: translateY(14px);
-  animation: settleIn 0.7s cubic-bezier(0.2,0,0,1) 0.15s forwards;
+  animation: settleIn 0.5s cubic-bezier(0.2,0,0,1) 0.15s forwards;
 }
 @keyframes settleIn { to { opacity: 1; transform: translateY(0); } }
 
-/* small corner sprig — quiet fill for the space beside the postmark */
-.corner-sprig {
-  position: absolute;
-  top: -8px;
-  right: 78px;
-  width: 34px;
-  height: 34px;
-  z-index: 3;
-  opacity: 0;
-  animation: sprigIn 0.5s ease 0.55s forwards;
-}
-@keyframes sprigIn { to { opacity: 0.85; } }
-
-/* postmark — the single corner mark, kept clean and unobstructed */
+/* postmark — brutalist stamp, top-right corner */
 .postmark {
   position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 64px;
-  height: 64px;
-  color: var(--violet-deep);
-  mix-blend-mode: multiply;
+  top: 20px;
+  right: 20px;
+  width: 76px;
+  padding: 10px 6px;
+  background: var(--surface);
+  border: 3px double var(--ink);
+  color: var(--ink);
+  text-align: center;
+  transform: rotate(-6deg);
   opacity: 0;
-  transform: rotate(-9deg) scale(1.2);
-  animation: stampDown 0.4s cubic-bezier(0.3,0,0.2,1) 0.75s forwards;
+  animation: stampDown 0.3s cubic-bezier(0.3,0,0.2,1) 0.6s forwards;
   z-index: 4;
   pointer-events: none;
 }
-@keyframes stampDown { to { opacity: 0.75; transform: rotate(-9deg) scale(1); } }
-.postmark svg { width: 100%; height: 100%; }
-.postmark text { font-family: var(--font-mono); fill: currentColor; }
+@keyframes stampDown { to { opacity: 0.92; } }
+.postmark .postmark__ring {
+  font-family: var(--font-mono);
+  font-size: 6.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+.postmark .postmark__date {
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1;
+}
+.postmark .postmark__sub {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
 
 /* letterhead */
 .letterhead { padding: 30px 24px 18px; }
 .letterhead .from-row {
-  display: flex; align-items: center; gap: 12px;
-  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: var(--border-width) solid var(--ink);
 }
 .seal-avatar {
   position: relative;
-  width: 44px; height: 44px;
-  border-radius: 50%;
+  width: 48px; height: 48px;
   flex-shrink: 0;
-  background: radial-gradient(circle at 32% 26%, #fdeef6 0%, #d9c3ee 32%, #9a80cf 68%, #6a56b0 100%);
-  box-shadow:
-    inset 0 -3px 5px rgba(95,75,170,0.4),
-    inset 0 2px 3px rgba(255,255,255,0.65),
-    0 3px 7px rgba(95,75,170,0.28);
+  background: var(--accent-3);
+  border: var(--border-width) solid var(--ink);
+  box-shadow: 3px 3px 0 0 var(--ink);
   display: flex; align-items: center; justify-content: center;
-}
-.seal-avatar::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  border: 1px solid rgba(138,118,201,0.4);
-}
-.seal-avatar .seal-spark {
-  position: absolute;
-  top: -3px; right: -3px;
-  width: 11px; height: 11px;
 }
 .seal-avatar span {
   font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 600;
-  font-size: 14.5px;
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(90,70,160,0.5);
+  font-size: 15px;
+  color: var(--surface);
   letter-spacing: 0.2px;
 }
 .letterhead .from-text { min-width: 0; }
 .letterhead .from-text .k {
-  font-family: var(--font-type);
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--ink-faint);
   display: block;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
+  font-weight: 700;
 }
 .letterhead .from-text .v {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 16px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 17px;
   color: var(--ink);
   word-break: break-word;
 }
 
 .field-line {
-  display: flex; gap: 14px; padding: 8px 0;
-  border-bottom: 1px dotted var(--line);
+  display: flex; gap: 14px; padding: 10px 0;
+  border-bottom: 2px solid var(--line);
   font-size: 13.5px;
 }
 .field-line:last-child { border-bottom: none; }
@@ -253,36 +261,35 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--ink-faint);
-  width: 62px;
+  width: 66px;
   flex-shrink: 0;
   padding-top: 2px;
+  font-weight: 700;
 }
-.field-line .v { color: var(--ink-soft); word-break: break-word; flex: 1; }
-#msg-subject.v { color: var(--ink); font-weight: 600; }
+.field-line .v { color: var(--ink-soft); word-break: break-word; flex: 1; font-weight: 500; }
+#msg-subject.v { color: var(--ink); font-weight: 700; }
 #msg-uid.v { font-family: var(--font-mono); font-size: 12px; }
 
-/* perforation */
-.perforation { position: relative; height: 0; border-top: 1.5px dashed var(--line); margin: 4px 22px 0; }
-.perforation::before, .perforation::after {
-  content: ''; position: absolute; top: -8px;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: var(--bg-1);
-}
-.perforation::before { left: -30px; }
-.perforation::after { right: -30px; }
+/* perforation — solid brutalist divider */
+.perforation { height: 0; border-top: var(--border-width) solid var(--ink); margin: 4px 0 0; }
 
 /* body */
 .letter-body-wrap { padding: 22px 24px 28px; }
 .letter-body-wrap .body-label {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: var(--ink-faint);
-  margin-bottom: 10px;
+  color: var(--ink);
+  background: var(--accent-2);
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  border: 2px solid var(--ink);
+  margin-bottom: 14px;
+  font-weight: 700;
 }
 .body-content {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 15.5px;
   line-height: 1.85;
   color: var(--ink-soft);
@@ -290,35 +297,40 @@ body {
   word-break: break-word;
   min-height: 70px;
 }
-.body-content.typing { border-right: 2px solid var(--violet); }
+.body-content.typing { border-right: 3px solid var(--accent); }
 .body-content.empty { font-style: italic; color: var(--ink-faint); opacity: 0.85; }
 
 /* footer */
-.footer { text-align: center; padding: 20px 0 0; }
+.footer { text-align: center; padding: 24px 0 0; }
 .footer-chip {
   display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--font-type);
+  font-family: var(--font-mono);
   font-size: 10.5px; letter-spacing: 0.6px;
-  color: var(--ink-soft);
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  padding: 0.5em 0.9em;
+  font-weight: 600;
 }
-.footer-chip svg { width: 13px; height: 13px; opacity: 0.8; }
 
 /* error */
-.error { text-align: center; padding: 58px 24px; }
+.error { text-align: center; padding: 60px 24px; }
 .error .rts-stamp {
   display: inline-block;
-  font-family: var(--font-type);
-  font-size: 14px; letter-spacing: 2px;
-  color: var(--violet-deep);
-  border: 3px double var(--violet-deep);
-  padding: 10px 18px;
+  font-family: var(--font-display);
+  font-size: 15px; letter-spacing: 2px;
+  color: var(--surface);
+  background: var(--accent);
+  border: 3px double var(--ink);
+  padding: 12px 20px;
   transform: rotate(-5deg);
-  opacity: 0.85;
-  mix-blend-mode: multiply;
-  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+  text-transform: uppercase;
 }
 .error .error-desc {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 14px; color: var(--ink-soft);
   max-width: 280px; margin: 0 auto; line-height: 1.6;
 }
@@ -335,13 +347,12 @@ body {
 
 @media (max-width: 480px) {
   body { padding: 28px 10px 48px; }
-  .masthead h1 { font-size: 26px; }
+  .masthead h1 { font-size: 32px; }
   .letterhead { padding: 26px 18px 14px; }
   .letter-body-wrap { padding: 18px 18px 22px; }
-  .postmark { width: 54px; height: 54px; right: 12px; top: 14px; }
-  .corner-sprig { right: 60px; top: -6px; width: 28px; height: 28px; }
-  .perforation { margin: 4px 16px 0; }
-  .field-line .k { width: 54px; }
+  .postmark { width: 62px; right: 14px; top: 16px; padding: 8px 4px; }
+  .postmark .postmark__date { font-size: 12px; }
+  .field-line .k { width: 56px; }
 }
 
 /* scroll works, scrollbar hidden */
@@ -375,32 +386,20 @@ html::-webkit-scrollbar {
 </style>
 </head>
 <body>
-  <svg width="0" height="0" style="position:absolute">
-    <defs>
-      <linearGradient id="wingGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#8a76c9"/>
-        <stop offset="55%" stop-color="#f0a8c9"/>
-        <stop offset="100%" stop-color="#eeb949"/>
-      </linearGradient>
-    </defs>
-  </svg>
-
   <div class="sparkle-field" id="sparkle-field"></div>
 
   <div id="app">
     <div class="masthead">
       <div class="eyebrow-row">
-        <svg viewBox="0 0 20 20" fill="#eeb949"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
-        
-        <svg viewBox="0 0 20 20" fill="#eeb949"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
+        <span class="eyebrow">TEMP GMAIL &middot; MESSAGE VIEWER</span>
       </div>
-      <h1>Zeron <span class="accent">Mail</span></h1>
-      <div class="hero-sub">TEMP GMAIL &middot; MESSAGE VIEWER</div>
+      <h1>ZERON <span class="accent">MAIL</span></h1>
+      <div class="hero-sub">// RAW MESSAGE ARCHIVE</div>
       <div class="dot-trio"><span></span><span></span><span></span></div>
     </div>
 
     <div id="loading" class="loading">
-      <svg class="spark-loader" viewBox="0 0 20 20" fill="currentColor"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
+      <div class="spark-loader"></div>
       <span class="typewriter-line" id="loading-text"></span>
     </div>
 
@@ -408,40 +407,16 @@ html::-webkit-scrollbar {
       <div class="letter-wrap">
         <div class="tear-edge"></div>
         <div class="letter-card">
-          <div class="corner-sprig">
-            <svg viewBox="0 0 40 40">
-              <path d="M20,36 C19,26 17,20 8,12" fill="none" stroke="#8a76c9" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
-              <ellipse cx="12" cy="17" rx="4" ry="1.8" fill="#9cb68f" opacity="0.75" transform="rotate(-35 12 17)"/>
-              <g transform="translate(7,9)">
-                <circle cx="-3.2" cy="0" r="2.8" fill="#f0a8c9"/>
-                <circle cx="3.2" cy="0" r="2.8" fill="#f0a8c9"/>
-                <circle cx="0" cy="-3.2" r="2.8" fill="#f0a8c9"/>
-                <circle cx="0" cy="3.2" r="2.8" fill="#f0a8c9"/>
-                <circle cx="0" cy="0" r="1.3" fill="#eeb949"/>
-              </g>
-            </svg>
-          </div>
-
           <div class="postmark" id="postmark">
-            <svg viewBox="0 0 120 120">
-              <defs>
-                <path id="circlePath" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/>
-              </defs>
-              <circle cx="60" cy="60" r="44" fill="none" stroke="currentColor" stroke-width="1.4"/>
-              <circle cx="60" cy="60" r="35" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="1.5 3"/>
-              <text font-size="8" letter-spacing="2">
-                <textPath href="#circlePath" startOffset="2%">ZERON TEMP MAIL &#8226; VERIFIED &#8226;</textPath>
-              </text>
-              <text x="60" y="57" text-anchor="middle" font-size="12.5" font-weight="600" id="postmark-date">MAIL</text>
-              <text x="60" y="71" text-anchor="middle" font-size="6" letter-spacing="1" id="postmark-sub">RECEIVED</text>
-            </svg>
+            <div class="postmark__ring">VERIFIED</div>
+            <div class="postmark__date" id="postmark-date">MAIL</div>
+            <div class="postmark__sub" id="postmark-sub">RECEIVED</div>
           </div>
 
           <div class="letterhead">
             <div class="from-row">
               <div class="seal-avatar">
                 <span id="sender-avatar">?</span>
-                <svg class="seal-spark" viewBox="0 0 20 20" fill="#eeb949"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>
               </div>
               <div class="from-text">
                 <span class="k">From</span>
@@ -464,10 +439,7 @@ html::-webkit-scrollbar {
       </div>
 
       <div class="footer">
-        <div class="footer-chip">
-          <svg viewBox="0 0 34 28"><line x1="17" y1="4" x2="17" y2="24" stroke="#6a6288" stroke-width="1.1"/><ellipse cx="9" cy="11" rx="8.5" ry="6.5" fill="url(#wingGrad)" opacity="0.7"/><ellipse cx="25" cy="11" rx="8.5" ry="6.5" fill="url(#wingGrad)" opacity="0.7"/></svg>
-          Zeron Temp Mail &mdash; crafted with care
-        </div>
+        <div class="footer-chip">ZERON TEMP MAIL — BUILT RAW</div>
       </div>
     </div>
 
@@ -493,7 +465,7 @@ html::-webkit-scrollbar {
     const positions = [
       [4,10],[92,8],[8,32],[95,28],[3,58],[90,64],[12,86],[88,90],[50,4],[48,95],[22,48],[76,44]
     ];
-    const colors = ['#8a76c9', '#f0a8c9', '#eeb949'];
+    const colors = ['#0A0A0A', '#E8342A', '#F2C200', '#1B4DFF'];
     positions.forEach(function (pos, i) {
       const el = document.createElement('div');
       el.className = 'spark';
@@ -501,7 +473,7 @@ html::-webkit-scrollbar {
       el.style.top = pos[1] + '%';
       el.style.animationDelay = (i * 0.35) + 's';
       const color = colors[i % colors.length];
-      el.innerHTML = '<svg viewBox="0 0 20 20" fill="' + color + '"><path d="M10 0 L11.8 8.2 L20 10 L11.8 11.8 L10 20 L8.2 11.8 L0 10 L8.2 8.2 Z"/></svg>';
+      el.innerHTML = '<svg viewBox="0 0 20 20"><rect x="7" y="0" width="6" height="20" fill="' + color + '"/><rect x="0" y="7" width="20" height="6" fill="' + color + '"/></svg>';
       field.appendChild(el);
     });
   }
@@ -574,7 +546,7 @@ html::-webkit-scrollbar {
   function init() {
     initTelegramMiniApp();
     seedSparkles();
-    typeLoadingLine(document.getElementById('loading-text'), 'retrieving message…');
+    typeLoadingLine(document.getElementById('loading-text'), 'RETRIEVING MESSAGE...');
 
     const from = decodeSafe(getParam('from'));
     const to = decodeSafe(getParam('to'));
